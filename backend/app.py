@@ -9,6 +9,9 @@ import requests  # For Mistral API calls
 from statsmodels.tsa.arima.model import ARIMA
 from flask import send_from_directory
 
+# Path to React build folder
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../frontend/build")
+
 warnings.filterwarnings("ignore")
 
 app = Flask(__name__)
@@ -30,9 +33,17 @@ def save_json_file(filename, data):
 
 # --- ROUTES ---
 
-@app.route("/")
-def home():
-    return jsonify({"message": "Welcome to Smart Sales API"})
+# Serve React build static files
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_react(path):
+    build_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../frontend/build")
+    if path != "" and os.path.exists(os.path.join(build_dir, path)):
+        return send_from_directory(build_dir, path)
+    else:
+        # fallback to index.html for React Router
+        return send_from_directory(build_dir, "index.html")
+
 
 # === Monthly Sales Routes ===
 @app.route("/add_sales", methods=['POST'])
