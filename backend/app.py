@@ -65,18 +65,7 @@ def serve_static(filename):
 
 
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve_react(path):
-    # Full path of requested file
-    full_path = os.path.join(FRONTEND_BUILD_DIR, path)
 
-    # Serve file if exists
-    if path != "" and os.path.isfile(full_path):
-        return send_from_directory(FRONTEND_BUILD_DIR, path)
-
-    # Always serve index.html for React Router
-    return send_from_directory(FRONTEND_BUILD_DIR, 'index.html')
 
 
 print("SERVING REACT FROM:", FRONTEND_BUILD_DIR)
@@ -105,7 +94,7 @@ def add_sales():
         "data": {"month": month, "sales": sales}
     })
 
-@app.route("/dashboard")
+@app.route("/api/dashboard")
 def dashboard():
     sales_data = load_json_file('sales_data.json', [])
 
@@ -256,7 +245,7 @@ def add_product_sales():
     save_json_file('product_data.json', product_data)
     return jsonify({"message": "Product added successfully", "data": new_product})
 
-@app.route("/products-dashboard")
+@app.route("/api/products-dashboard")
 def products_dashboard():
     product_data = load_json_file('product_data.json', [])
     predictions = []
@@ -402,6 +391,21 @@ def sell_product():
 
 
 
+# === CATCH-ALL ROUTE FOR REACT ===
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react(path):
+    # Don't serve React for API calls
+    if path.startswith('api/'):
+        return jsonify({"error": "API endpoint not found"}), 404
+
+    full_path = os.path.join(FRONTEND_BUILD_DIR, path)
+
+    if path != "" and os.path.isfile(full_path):
+        return send_from_directory(FRONTEND_BUILD_DIR, path)
+
+    # Always return index.html for React Router
+    return send_from_directory(FRONTEND_BUILD_DIR, 'index.html')
 
 
 
