@@ -34,18 +34,17 @@ def save_json_file(filename, data):
 # --- ROUTES ---
 
 # Serve React build static files and handle React Router
+FRONTEND_BUILD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend/build")
+
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve_react(path):
-    build_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../frontend/build")
+    # If the requested file exists in build folder, serve it
+    if path != "" and os.path.exists(os.path.join(FRONTEND_BUILD_DIR, path)):
+        return send_from_directory(FRONTEND_BUILD_DIR, path)
     
-    # If the requested file exists in the build folder, serve it
-    file_path = os.path.join(build_dir, path)
-    if path != "" and os.path.exists(file_path):
-        return send_from_directory(build_dir, path)
-    
-    # Otherwise, fallback to index.html (React Router handles frontend routes)
-    return send_from_directory(build_dir, "index.html")
+    # Otherwise, serve index.html (React Router fallback)
+    return send_from_directory(FRONTEND_BUILD_DIR, "index.html")
 
 
 
