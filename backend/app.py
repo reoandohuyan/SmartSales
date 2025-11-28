@@ -7,6 +7,7 @@ import json
 import os
 import requests  # For Mistral API calls
 from statsmodels.tsa.arima.model import ARIMA
+from flask import send_from_directory
 
 warnings.filterwarnings("ignore")
 
@@ -348,6 +349,22 @@ def sell_product():
                 return jsonify({"error": f"Not enough stock. Current stock: {p['stock']}"}), 400
 
     return jsonify({"error": "Product not found"}), 404
+
+
+
+
+
+# Serve React build static files
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_react(path):
+    build_dir = os.path.join(os.getcwd(), "frontend", "build")
+    if path != "" and os.path.exists(os.path.join(build_dir, path)):
+        return send_from_directory(build_dir, path)
+    else:
+        # fallback to index.html for React Router
+        return send_from_directory(build_dir, "index.html")
+
 
 
 if __name__ == "__main__":
