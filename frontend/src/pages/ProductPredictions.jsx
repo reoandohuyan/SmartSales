@@ -71,29 +71,46 @@ const ProductPredictions = () => {
     }
 
     const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError("");
+  try {
+    setLoading(true);
+    setError("");
 
-        const resSales = await fetch("https://smartsales-dt0f.onrender.com/dashboard");
-        if (!resSales.ok) throw new Error(`Dashboard fetch failed: ${resSales.statusText}`);
-        const salesJson = await resSales.json();
-        setSalesData({
-          months: [...salesJson.months, "Next Month"],
-          sales: [...salesJson.sales, salesJson.linear_regression_prediction],
-        });
+    // 1️⃣ Fetch sales data
+    const resSales = await fetch("https://smartsales-dt0f.onrender.com/api/dashboard");
+    if (!resSales.ok) {
+      throw new Error(`Dashboard API failed with status ${resSales.status}`);
+    }
+    const salesJson = await resSales.json(); // safer
+    setSalesData({
+      months: [...salesJson.months, "Next Month"],
+      sales: [...salesJson.sales, salesJson.linear_regression_prediction],
+    });
 
-        const resPred = await fetch("https://smartsales-dt0f.onrender.com/products-dashboard");
-        if (!resPred.ok) throw new Error(`Products fetch failed: ${resPred.statusText}`);
-        const prodJson = await resPred.json();
-        setPredictions(prodJson.predictions || []);
-      } catch (err) {
-        console.error("Error fetching product predictions:", err);
-        setError("Failed to load product predictions. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    // 2️⃣ Fetch product predictions
+    // 2️⃣ Fetch product predictions
+const resPred = await fetch("https://smartsales-dt0f.onrender.com/api/products-dashboard");
+console.log("Products response status:", resPred.status);
+
+if (!resPred.ok) {
+  throw new Error("Products API returned an error");
+}
+
+const prodJson = await resPred.json(); // ✅ automatically parses JSON
+console.log("Products JSON:", prodJson);
+
+setPredictions(prodJson.predictions || []);
+
+
+  } catch (err) {
+    console.error("Error fetching product predictions:", err);
+    setError("Failed to load product predictions. Please check console logs.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
 
     fetchData();
   }, [location.state]);

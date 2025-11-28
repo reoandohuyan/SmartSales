@@ -391,21 +391,25 @@ def sell_product():
 
 
 
-# === CATCH-ALL ROUTE FOR REACT ===
+# === CATCH-ALL ROUTE FOR REACT (Fixed) ===
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
-    # Don't serve React for API calls
+    # If the request is for an API route, let Flask handle it or return 404
     if path.startswith('api/'):
-        return jsonify({"error": "API endpoint not found"}), 404
+        return jsonify({"error": f"API endpoint '/{path}' not found"}), 404
 
+    # Serve static files if they exist
     full_path = os.path.join(FRONTEND_BUILD_DIR, path)
-
     if path != "" and os.path.isfile(full_path):
         return send_from_directory(FRONTEND_BUILD_DIR, path)
 
-    # Always return index.html for React Router
-    return send_from_directory(FRONTEND_BUILD_DIR, 'index.html')
+    # Serve React index.html for all other frontend routes
+    index_path = os.path.join(FRONTEND_BUILD_DIR, 'index.html')
+    if os.path.isfile(index_path):
+        return send_from_directory(FRONTEND_BUILD_DIR, 'index.html')
+    else:
+        return "React build not found", 404
 
 
 
