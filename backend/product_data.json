@@ -1,0 +1,92 @@
+[
+    {
+        "product": "Funky",
+        "last_sales": 120,
+        "stock": 60
+    },
+    {
+        "product": "Combi",
+        "last_sales": 50,
+        "stock": 40
+    },
+    {
+        "product": "Tinapa",
+        "last_sales": 60,
+        "stock": 20
+    },
+    {
+        "product": "Soft Drinks",
+        "last_sales": 20,
+        "stock": 50
+    },
+    {
+        "product": "Canned Sardines",
+        "last_sales": 70,
+        "stock": 35
+    },
+    {
+        "product": "Rice",
+        "last_sales": 50,
+        "stock": 20
+    },
+    {
+        "product": "Condensed Milk",
+        "last_sales": 40,
+        "stock": 15
+    },
+    {
+        "product": "Juice Drink",
+        "last_sales": 30,
+        "stock": 25
+    },
+    {
+        "product": "Candies",
+        "last_sales": 60,
+        "stock": 30
+    },
+    {
+        "product": "Soap",
+        "last_sales": 25,
+        "stock": 30
+    },
+    {
+        "product": "Toothpaste",
+        "last_sales": 20,
+        "stock": 20
+    },
+    {
+        "product": "Vicks VapoRub",
+        "last_sales": 10,
+        "stock": 10
+    },
+    {
+        "product": "Bottled Water",
+        "last_sales": 100,
+        "stock": 80
+    },
+    {
+        "product": "Coffee Mix",
+        "last_sales": 45,
+        "stock": 25
+    },
+    {
+        "product": "Lollipop",
+        "last_sales": 35,
+        "stock": 40
+    },
+    {
+        "product": "Bread",
+        "last_sales": 55,
+        "stock": 30
+    },
+    {
+        "product": "Pancit Canton",
+        "last_sales": 20,
+        "stock": 30
+    },
+    {
+        "product": "Taho",
+        "last_sales": 90,
+        "stock": 60
+    }
+]

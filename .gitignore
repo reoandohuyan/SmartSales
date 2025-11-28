@@ -1,0 +1,14 @@
+# Node.js dependencies
+backend/node_modules/
+frontend/node_modules/
+backend/package-lock.json
+frontend/package-lock.json
+
+# Python virtual environment
+backend/venv/
+
+# Build outputs
+frontend/build/
+
+# Environment variables
+*.env

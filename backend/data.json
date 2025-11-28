@@ -1,0 +1,95 @@
+{
+  "products": [
+    {
+      "name": "Lucky Me Pancit Canton (Original)",
+      "category": "Instant Noodles",
+      "price": 15.00,
+      "sales_history": [120, 150, 160, 180, 200, 210],
+      "last_sales": 210,
+      "forecast": 225,
+      "trend": "Up"
+    },
+    {
+      "name": "Coca-Cola 1L",
+      "category": "Beverages",
+      "price": 45.00,
+      "sales_history": [80, 90, 100, 110, 120, 130],
+      "last_sales": 130,
+      "forecast": 145,
+      "trend": "Up"
+    },
+    {
+      "name": "Bear Brand Powdered Milk 320g",
+      "category": "Dairy",
+      "price": 80.00,
+      "sales_history": [60, 65, 70, 68, 72, 70],
+      "last_sales": 70,
+      "forecast": 74,
+      "trend": "Up"
+    },
+    {
+      "name": "Surf Detergent Bar 380g",
+      "category": "Household",
+      "price": 12.00,
+      "sales_history": [200, 180, 175, 185, 190, 195],
+      "last_sales": 195,
+      "forecast": 190,
+      "trend": "Down"
+    },
+    {
+      "name": "Piattos (Cheese Flavor)",
+      "category": "Snacks",
+      "price": 20.00,
+      "sales_history": [150, 155, 160, 170, 165, 175],
+      "last_sales": 175,
+      "forecast": 182,
+      "trend": "Up"
+    },
+    {
+      "name": "Nescafe Classic 25g",
+      "category": "Beverages",
+      "price": 25.00,
+      "sales_history": [100, 105, 110, 108, 115, 120],
+      "last_sales": 120,
+      "forecast": 130,
+      "trend": "Up"
+    },
+    {
+      "name": "Silver Swan Soy Sauce 1L",
+      "category": "Condiments",
+      "price": 38.00,
+      "sales_history": [50, 55, 58, 60, 62, 65],
+      "last_sales": 65,
+      "forecast": 67,
+      "trend": "Up"
+    },
+    {
+      "name": "Milo 22g Sachet",
+      "category": "Beverages",
+      "price": 10.00,
+      "sales_history": [210, 220, 230, 240, 250, 255],
+      "last_sales": 255,
+      "forecast": 265,
+      "trend": "Up"
+    },
+    {
+      "name": "Palmolive Shampoo Sachet",
+      "category": "Toiletries",
+      "price": 7.00,
+      "sales_history": [190, 185, 200, 210, 205, 220],
+      "last_sales": 220,
+      "forecast": 230,
+      "trend": "Up"
+    },
+    {
+      "name": "Safeguard Soap 90g",
+      "category": "Toiletries",
+      "price": 25.00,
+      "sales_history": [70, 75, 78, 80, 82, 84],
+      "last_sales": 84,
+      "forecast": 87,
+      "trend": "Up"
+    }
+  ],
+  "months": ["April", "May", "June", "July", "August", "September"]
+}

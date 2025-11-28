@@ -1,0 +1,12 @@
+[
+    {
+        "product": "Taho",
+        "last_sales": 0,
+        "stock": 40
+    },
+    {
+        "product": "Funky",
+        "last_sales": 0,
+        "stock": 140
+    }
+]
