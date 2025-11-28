@@ -42,38 +42,40 @@ const HomePage = () => {
 
     try {
       if (mode === "forecast") {
-        const payload = { month, sales: Number(sales) };
-        await fetch("http://127.0.0.1:5000/add_sales", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+  const payload = { month, sales: Number(sales) };
+  await fetch("https://smartsales-dt0f.onrender.com/add_sales", {  // ✅ changed URL
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-        setMonth("");
-        setSales("");
-        navigate("/dashboard");
-      } else if (mode === "product") {
-        const payload = {
-          product,
-          last_sales: Number(sales),
-          stock: stock ? Number(stock) : Math.floor(Math.random() * 50) + 10,
-        };
+  setMonth("");
+  setSales("");
+  navigate("/dashboard");
+}
+ else if (mode === "product") {
+  const payload = {
+    product,
+    last_sales: Number(sales),
+    stock: stock ? Number(stock) : Math.floor(Math.random() * 50) + 10,
+  };
 
-        await fetch("http://127.0.0.1:5000/add_product_sales", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+  await fetch("https://smartsales-dt0f.onrender.com/add_product_sales", {  // ✅ changed URL
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-        setProduct("");
-        setMonth("");
-        setSales("");
-        setStock("");
+  setProduct("");
+  setMonth("");
+  setSales("");
+  setStock("");
 
-        navigate("/product_predictions", {
-          state: { highlightProduct: payload.product },
-        });
-      }
+  navigate("/product_predictions", {
+    state: { highlightProduct: payload.product },
+  });
+}
+
     } catch (err) {
       console.error("Error submitting:", err);
     } finally {
@@ -89,11 +91,12 @@ const HomePage = () => {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/add_product_stock", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch("https://smartsales-dt0f.onrender.com/api/add_product_stock", {  // ✅ changed URL
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload),
+});
+
 
       const data = await response.json();
 
@@ -119,11 +122,12 @@ const HomePage = () => {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/sell_product", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch("https://smartsales-dt0f.onrender.com/api/sell_product", {  // ✅ changed URL
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload),
+});
+
 
       const data = await response.json();
 

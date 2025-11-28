@@ -75,7 +75,7 @@ const ProductPredictions = () => {
         setLoading(true);
         setError("");
 
-        const resSales = await fetch("http://127.0.0.1:5000/dashboard");
+        const resSales = await fetch("https://smartsales-dt0f.onrender.com/dashboard");
         if (!resSales.ok) throw new Error(`Dashboard fetch failed: ${resSales.statusText}`);
         const salesJson = await resSales.json();
         setSalesData({
@@ -83,7 +83,7 @@ const ProductPredictions = () => {
           sales: [...salesJson.sales, salesJson.linear_regression_prediction],
         });
 
-        const resPred = await fetch("http://127.0.0.1:5000/products-dashboard");
+        const resPred = await fetch("https://smartsales-dt0f.onrender.com/products-dashboard");
         if (!resPred.ok) throw new Error(`Products fetch failed: ${resPred.statusText}`);
         const prodJson = await resPred.json();
         setPredictions(prodJson.predictions || []);
@@ -325,11 +325,12 @@ const handleDelete = async (productName) => {
   if (!confirmDelete) return;
 
   try {
-    const res = await fetch("http://127.0.0.1:5000/api/delete-product", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product: productName }),
-    });
+    const res = await fetch("https://smartsales-dt0f.onrender.com/api/delete-product", {
+  method: "DELETE",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ product: productName }),
+});
+
 
     const data = await res.json();
 

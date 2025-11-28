@@ -38,11 +38,12 @@ const Chatbot = () => {
     ]);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/mistral", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }),
-      });
+      const response = await fetch("https://smartsales-dt0f.onrender.com/api/mistral", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message: userMessage }),
+});
+
 
       const data = await response.json();
       setMessages((prev) => prev.filter((m) => m.id !== loadingId));

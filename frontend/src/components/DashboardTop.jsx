@@ -48,11 +48,12 @@ const DashboardTop = () => {
         sales: editableSales[idx] || 0
       }));
 
-      const res = await fetch("http://localhost:5000/api/update-sales", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: payload }),
-      });
+      const res = await fetch("https://smartsales-dt0f.onrender.com/api/update-sales", {
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ data: payload }),
+});
+
 
       if (!res.ok) {
         const resData = await res.json();
@@ -78,11 +79,12 @@ const DashboardTop = () => {
     if (!window.confirm(`Are you sure you want to delete ${month}?`)) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/delete-sale", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ month }),
-      });
+      const res = await fetch("https://smartsales-dt0f.onrender.com/api/delete-sale", {
+  method: "DELETE",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ month }),
+});
+
 
       if (!res.ok) {
         const resData = await res.json();

@@ -31,7 +31,8 @@ const Dashboard = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("http://localhost:5000/api/sales-data");
+      const response = await fetch("https://smartsales-dt0f.onrender.com/api/sales-data"); // ✅ updated URL
+
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
       const data = await response.json();
@@ -274,11 +275,12 @@ const Dashboard = () => {
                       sales: sales[idx],
                     }));
 
-                    const res = await fetch("http://localhost:5000/api/update-sales", {
-                      method: "PUT",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ data: payload }),
-                    });
+                    const res = await fetch("https://smartsales-dt0f.onrender.com/api/update-sales", {  // ✅ updated URL
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ data: payload }),
+});
+
 
                     if (!res.ok) {
                       const errData = await res.json();
