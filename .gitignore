@@ -5,8 +5,6 @@ package-lock.json
 # Python virtual environment
 **/venv/
 
-# Build folders
-frontend/build/
 
 # Env files
 *.env
