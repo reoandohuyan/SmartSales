@@ -1,12 +1,11 @@
 # Node.js
-frontend/node_modules/
-backend/node_modules/
+**/node_modules/
 package-lock.json
 
-# Python
-backend/venv/
+# Python virtual environment
+**/venv/
 
-# Build outputs
+# Build folders
 frontend/build/
 
 # Env files
