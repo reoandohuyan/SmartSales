@@ -365,18 +365,6 @@ def sell_product():
 
 
 
-# Serve React build static files
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def serve_react(path):
-    build_dir = os.path.join(os.getcwd(), "frontend", "build")
-    if path != "" and os.path.exists(os.path.join(build_dir, path)):
-        return send_from_directory(build_dir, path)
-    else:
-        # fallback to index.html for React Router
-        return send_from_directory(build_dir, "index.html")
-
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
