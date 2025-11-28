@@ -10,7 +10,6 @@ from statsmodels.tsa.arima.model import ARIMA
 from flask import send_from_directory
 
 # Path to React build folder
-FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../frontend/build")
 
 warnings.filterwarnings("ignore")
 
@@ -33,18 +32,55 @@ def save_json_file(filename, data):
 
 # --- ROUTES ---
 
-# Serve React build static files and handle React Router
-FRONTEND_BUILD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend/build")
+# Path to React build folder (one level above backend)
+FRONTEND_BUILD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../frontend/build")
 
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
+# Correct path to React build
+FRONTEND_BUILD_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "frontend", "build")
+)
+
+
+# --- Serve React Static Files Correctly ---
+
+# Serve JS files
+@app.route('/static/js/<path:filename>')
+def serve_js(filename):
+    return send_from_directory(os.path.join(FRONTEND_BUILD_DIR, "static/js"), filename)
+
+# Serve CSS files
+@app.route('/static/css/<path:filename>')
+def serve_css(filename):
+    return send_from_directory(os.path.join(FRONTEND_BUILD_DIR, "static/css"), filename)
+
+# Serve media (images/fonts)
+@app.route('/static/media/<path:filename>')
+def serve_media(filename):
+    return send_from_directory(os.path.join(FRONTEND_BUILD_DIR, "static/media"), filename)
+
+# Generic static handler (for safety)
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory(os.path.join(FRONTEND_BUILD_DIR, "static"), filename)
+
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
 def serve_react(path):
-    # If the requested file exists in build folder, serve it
-    if path != "" and os.path.exists(os.path.join(FRONTEND_BUILD_DIR, path)):
+    # Full path of requested file
+    full_path = os.path.join(FRONTEND_BUILD_DIR, path)
+
+    # Serve file if exists
+    if path != "" and os.path.isfile(full_path):
         return send_from_directory(FRONTEND_BUILD_DIR, path)
-    
-    # Otherwise, serve index.html (React Router fallback)
-    return send_from_directory(FRONTEND_BUILD_DIR, "index.html")
+
+    # Always serve index.html for React Router
+    return send_from_directory(FRONTEND_BUILD_DIR, 'index.html')
+
+
+print("SERVING REACT FROM:", FRONTEND_BUILD_DIR)
+
 
 
 
