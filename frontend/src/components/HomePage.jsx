@@ -17,6 +17,8 @@ const HomePage = () => {
   const navigate = useNavigate();
   const location = useLocation(); // ADDED
   const [isOpen, setIsOpen] = useState(false); // MOBILE MENU TOGGLE
+  const [showForm, setShowForm] = useState(false); // NEW
+
 
 
   // ⭐ INITIAL MODE FROM LOCATION
@@ -151,15 +153,15 @@ const HomePage = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden text-slate-200 font-sans">
-      {/* BACKGROUND */}
-      <div
-        className="absolute inset-0 bg-cover bg-center z-0"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=1600&q=80')",
-          filter: "brightness(0.3)",
-        }}
-      ></div>
+     {/* BACKGROUND */}
+<div
+  className="absolute inset-0 bg-cover bg-center z-0"
+  style={{
+    backgroundImage: "url('/store2.gif')", // make sure store.gif is in your public folder
+    filter: "brightness(0.3)",
+  }}
+></div>
+
 
     {/* NAVBAR */}
 <nav className="fixed top-0 w-full bg-slate-900/60 backdrop-blur-xl shadow-lg border-b border-slate-700 z-50">
@@ -297,95 +299,114 @@ const HomePage = () => {
         </div>
 
         {/* FORM PANEL */}
-<div className="w-11/12 md:w-full max-w-xl md:max-w-2xl p-3 md:p-6 rounded-3xl bg-gradient-to-r from-cyan-500/40 to-blue-500/40 mb-8 shadow-2xl">
-          <div className="bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-slate-700 shadow-xl">
-            <div className="flex items-center justify-center gap-2 text-cyan-300 mb-3">
-              <SparklesIcon className="w-6 h-6" />
-              <span className="font-semibold text-lg">Choose Forecasting Mode</span>
+{showForm ? (
+  <div className="w-11/12 md:w-full max-w-xl md:max-w-2xl p-3 md:p-6 rounded-3xl bg-gradient-to-r from-cyan-500/40 to-blue-500/40 mb-8 shadow-2xl animate-fadeIn">
+    <div className="bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-slate-700 shadow-xl">
+      <div className="flex items-center justify-center gap-2 text-cyan-300 mb-3">
+        <SparklesIcon className="w-6 h-6" />
+        <span className="font-semibold text-lg">Choose Forecasting Mode</span>
+      </div>
+
+      {/* MODE SWITCH */}
+      <div className="grid grid-cols-2 mb-6 gap-3">
+        <button
+          onClick={() => setMode("forecast")}
+          className={`py-3 rounded-xl font-bold transition-all ${
+            mode === "forecast"
+              ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg"
+              : "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700"
+          }`}
+        >
+          Total Sales
+        </button>
+        <button
+          onClick={() => setMode("product")}
+          className={`py-3 rounded-xl font-bold transition-all ${
+            mode === "product"
+              ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg"
+              : "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700"
+          }`}
+        >
+          Product Sales
+        </button>
+      </div>
+
+      {/* FORM */}
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {mode === "product" && (
+          <>
+            <div>
+              <label className="text-slate-300 font-medium">Product</label>
+              <input
+                type="text"
+                value={product}
+                onChange={(e) => setProduct(e.target.value)}
+                className="w-full mt-2 p-2 md:p-3 bg-slate-800 border border-slate-700 rounded-lg text-white"
+                required
+              />
             </div>
-
-            {/* MODE SWITCH */}
-            <div className="grid grid-cols-2 mb-6 gap-3">
-              <button
-                onClick={() => setMode("forecast")}
-                className={`py-3 rounded-xl font-bold transition-all ${
-                  mode === "forecast"
-                    ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg"
-                    : "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700"
-                }`}
-              >
-                Total Sales
-              </button>
-              <button
-                onClick={() => setMode("product")}
-                className={`py-3 rounded-xl font-bold transition-all ${
-                  mode === "product"
-                    ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg"
-                    : "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700"
-                }`}
-              >
-                Product Sales
-              </button>
+            <div>
+              <label className="text-slate-300 font-medium">Stock</label>
+              <input
+                type="number"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                className="w-full mt-2 p-3 bg-slate-800 border border-slate-700 rounded-lg text-white"
+              />
             </div>
+          </>
+        )}
 
-            {/* FORM */}
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {mode === "product" && (
-                <>
-                  <div>
-                    <label className="text-slate-300 font-medium">Product</label>
-                    <input
-                      type="text"
-                      value={product}
-                      onChange={(e) => setProduct(e.target.value)}
-                        className="w-full mt-2 p-2 md:p-3 bg-slate-800 border border-slate-700 rounded-lg text-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-slate-300 font-medium">Stock</label>
-                    <input
-                      type="number"
-                      value={stock}
-                      onChange={(e) => setStock(e.target.value)}
-                      className="w-full mt-2 p-3 bg-slate-800 border border-slate-700 rounded-lg text-white"
-                    />
-                  </div>
-                </>
-              )}
-
-              <div>
-                <label className="text-slate-300 font-medium">Month</label>
-                <input
-                  type="text"
-                  value={month}
-                  onChange={(e) => setMonth(e.target.value)}
-                  className="w-full mt-2 p-3 bg-slate-800 border border-slate-700 rounded-lg text-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-slate-300 font-medium">Sales</label>
-                <input
-                  type="number"
-                  value={sales}
-                  onChange={(e) => setSales(e.target.value)}
-                  className="w-full mt-2 p-3 bg-slate-800 border border-slate-700 rounded-lg text-white"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 font-bold text-white hover:scale-105"
-              >
-                {loading ? "Submitting..." : "Submit Data"}
-              </button>
-            </form>
-          </div>
+        <div>
+          <label className="text-slate-300 font-medium">Month</label>
+          <input
+            type="text"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+            className="w-full mt-2 p-3 bg-slate-800 border border-slate-700 rounded-lg text-white"
+            required
+          />
         </div>
+
+        <div>
+          <label className="text-slate-300 font-medium">Sales</label>
+          <input
+            type="number"
+            value={sales}
+            onChange={(e) => setSales(e.target.value)}
+            className="w-full mt-2 p-3 bg-slate-800 border border-slate-700 rounded-lg text-white"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 font-bold text-white hover:scale-105 transition transform"
+        >
+          {loading ? "Submitting..." : "Submit Data"}
+        </button>
+
+        {/* Cancel button */}
+        <button
+          type="button"
+          onClick={() => setShowForm(false)}
+          className="w-full py-3 mt-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition transform hover:scale-105"
+        >
+          Cancel
+        </button>
+      </form>
+    </div>
+  </div>
+) : (
+  <button
+    onClick={() => setShowForm(true)}
+    className="mt-8 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition transform animate-fadeIn"
+  >
+    Get Started
+  </button>
+)}
+
       </div>
 
       {/* RESTOCK MODAL */}

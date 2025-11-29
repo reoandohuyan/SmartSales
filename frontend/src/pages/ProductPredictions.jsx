@@ -124,11 +124,19 @@ setPredictions(prodJson.predictions || []);
   }, [location.state]);
 
   if (loading)
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white text-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        Loading product predictions...
-      </div>
-    );
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <img
+        src="/loading.gif" // make sure loading.gif is in your public folder
+        alt="Loading..."
+        className="w-96 h-80 rounded-2xl"
+      />
+    </div>
+  );
+
+
+
+
 
   if (error)
     return (
