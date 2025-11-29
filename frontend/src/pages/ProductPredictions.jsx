@@ -24,9 +24,12 @@ import {
   ChartPieIcon,
   PresentationChartLineIcon,
   TrophyIcon,
+  TrashIcon,
+  Bars3Icon,
   XMarkIcon,
-  TrashIcon, // ⭐ added
 } from "@heroicons/react/24/outline";
+
+
 
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -45,6 +48,11 @@ ChartJS.register(
 const ProductPredictions = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+// Delete confirmation modal state
+const [productToDelete, setProductToDelete] = useState(null);
+const [showDeleteModal, setShowDeleteModal] = useState(false);
+
 
 
   const [deletedMessage, setDeletedMessage] = useState(""); // ⭐ ADDED for delete confirmation toast
@@ -374,83 +382,119 @@ const handleDelete = async (productName) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-200 font-sans">
-      {/* NAVBAR */}
-      <nav className="flex justify-center gap-6 p-4 fixed top-0 w-full bg-slate-900/60 backdrop-blur-xl shadow-lg border-b border-slate-700 z-50">
-        <Link
-          to="/"
-          className={`px-5 py-2 rounded-lg flex items-center gap-2 font-medium transition-all hover:scale-105 ${
-            location.pathname === "/" ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white" : "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white"
-          }`}
-        >
-          <HomeIcon className="w-5 h-5" /> Home
-        </Link>
-        <Link
-          to="/dashboard"
-          className={`px-5 py-2 rounded-lg flex items-center gap-2 font-medium transition-all hover:scale-105 ${
-            location.pathname === "/dashboard" ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white" : "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white"
-          }`}
-        >
-          <ChartBarIcon className="w-5 h-5" /> Dashboard
-        </Link>
-        <Link
-          to="/chatbot"
-          className={`px-5 py-2 rounded-lg flex items-center gap-2 font-medium transition-all hover:scale-105 ${
-            location.pathname === "/chatbot" ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white" : "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white"
-          }`}
-        >
-          <CpuChipIcon className="w-5 h-5" /> Chatbot
-        </Link>
-        <Link
-          to="/product_predictions"
-          className={`px-5 py-2 rounded-lg flex items-center gap-2 font-medium transition-all hover:scale-105 ${
-            location.pathname === "/product_predictions" ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white" : "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white"
-          }`}
-        >
-          <CubeIcon className="w-5 h-5" /> Products
-        </Link>
-      </nav>
+     {/* NAVBAR */}
+<nav className="fixed top-0 w-full bg-slate-900/60 backdrop-blur-xl shadow-lg border-b border-slate-700 z-50">
+  <div className="flex justify-between items-center p-2 sm:p-3 md:p-4 relative">
+    {/* Logo on the left */}
+    <div className="text-cyan-400 font-bold text-lg sm:text-xl">
+      Smart Sales
+    </div>
+
+    {/* Desktop menu - hidden on mobile */}
+    <div className="hidden sm:flex flex-1 justify-center gap-2 sm:gap-3 md:gap-6">
+      {["/", "/dashboard", "/chatbot", "/product_predictions"].map((path, idx) => {
+        const icons = [<HomeIcon />, <ChartBarIcon />, <CpuChipIcon />, <CubeIcon />];
+        const labels = ["Home", "Dashboard", "Chatbot", "Products"];
+        return (
+          <Link
+            key={idx}
+            to={path}
+            className={`px-2 sm:px-3 py-1 sm:py-2 rounded-lg flex items-center gap-1 sm:gap-2 font-medium transition-all hover:scale-105 text-xs sm:text-sm md:text-base ${
+              location.pathname === path
+                ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white"
+                : "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white"
+            }`}
+          >
+            {React.cloneElement(icons[idx], { className: "w-3 h-3 sm:w-4 sm:h-5 md:w-5 md:h-5" })}{" "}
+            {labels[idx]}
+          </Link>
+        );
+      })}
+    </div>
+
+    {/* Mobile menu toggle */}
+    <button
+      className="sm:hidden text-white absolute right-3 top-2"
+      onClick={() => setIsOpen(!isOpen)}
+    >
+      {isOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
+    </button>
+  </div>
+
+  {/* Mobile collapsible menu */}
+  {isOpen && (
+    <div className="sm:hidden flex flex-col gap-2 px-3 pb-3">
+      {["/", "/dashboard", "/chatbot", "/product_predictions"].map((path, idx) => {
+        const icons = [<HomeIcon />, <ChartBarIcon />, <CpuChipIcon />, <CubeIcon />];
+        const labels = ["Home", "Dashboard", "Chatbot", "Products"];
+        return (
+          <Link
+            key={idx}
+            to={path}
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg ${
+              location.pathname === path
+                ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white"
+                : "bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white"
+            }`}
+            onClick={() => setIsOpen(false)}
+          >
+            {React.cloneElement(icons[idx], { className: "w-4 h-4" })} {labels[idx]}
+          </Link>
+        );
+      })}
+    </div>
+  )}
+</nav>
+
+
 
       <div className="p-5 pt-32 space-y-5 max-w-7xl mx-auto">
         <header className="text-center mb-6 flex flex-col items-center gap-2">
-          <h1 className="text-4xl font-bold text-cyan-400 mb-1 drop-shadow-[0_0_10px_#0ff] flex items-center gap-2">
-            <ChartPieIcon className="w-10 h-10" />
-            Product Sales Predictions
-          </h1>
-          <p className="text-gray-400">Smart insights on upcoming sales performance</p>
-        </header>
+  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-cyan-400 mb-1 drop-shadow-[0_0_10px_#0ff] flex flex-col sm:flex-row items-center gap-2">
+    <ChartPieIcon className="w-10 h-10" />
+    Product Sales Predictions
+  </h1>
+  <p className="text-sm sm:text-base text-gray-400">Smart insights on upcoming sales performance</p>
+</header>
+{/* Charts */}
+<div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+  <div
+    onClick={() => openModal("line")}
+    className="cursor-pointer bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-3 sm:p-5 hover:shadow-[0_0_25px_rgba(0,255,255,0.7)] transition-shadow duration-300"
+  >
+    <h2 className="text-cyan-400 font-semibold mb-3 drop-shadow-[0_0_6px_#0ff] flex items-center gap-2">
+      <PresentationChartLineIcon className="w-5 h-5 sm:w-6 sm:h-6" /> Historical Sales
+    </h2>
+    <div className="h-64 sm:h-72 md:h-80">
+      <Line data={lineData} options={{ ...lineOptions, responsive: true, maintainAspectRatio: false }} />
+    </div>
+  </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div
-            onClick={() => openModal("line")}
-            className="cursor-pointer bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-5 hover:shadow-[0_0_25px_rgba(0,255,255,0.7)] transition-shadow duration-300"
-          >
-            <h2 className="text-cyan-400 font-semibold mb-3 drop-shadow-[0_0_6px_#0ff] flex items-center gap-2">
-              <PresentationChartLineIcon className="w-6 h-6" /> Historical Sales
-            </h2>
-            <Line data={lineData} options={lineOptions} />
-          </div>
+  <div
+    onClick={() => openModal("bar")}
+    className="cursor-pointer bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-3 sm:p-5 hover:shadow-[0_0_25px_rgba(0,255,255,0.7)] transition-shadow duration-300"
+  >
+    <h2 className="text-cyan-400 font-semibold mb-3 drop-shadow-[0_0_6px_#0ff] flex items-center gap-2">
+      <ChartBarIcon className="w-5 h-5 sm:w-6 sm:h-6" /> Predicted vs Actual Sales
+    </h2>
+    <div className="h-64 sm:h-72 md:h-80">
+      <Bar data={barData} options={{ ...barOptions, responsive: true, maintainAspectRatio: false }} />
+    </div>
+  </div>
 
-          <div
-            onClick={() => openModal("bar")}
-            className="cursor-pointer bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-5 hover:shadow-[0_0_25px_rgba(0,255,255,0.7)] transition-shadow duration-300"
-          >
-            <h2 className="text-cyan-400 font-semibold mb-3 drop-shadow-[0_0_6px_#0ff] flex items-center gap-2">
-              <ChartBarIcon className="w-6 h-6" /> Predicted vs Actual Sales
-            </h2>
-            <Bar data={barData} options={barOptions} />
-          </div>
+  <div
+    onClick={() => openModal("doughnut")}
+    className="cursor-pointer bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-3 sm:p-5 hover:shadow-[0_0_25px_rgba(0,255,255,0.7)] transition-shadow duration-300"
+  >
+    <h2 className="text-cyan-400 font-semibold mb-3 drop-shadow-[0_0_6px_#0ff] flex items-center gap-2">
+      <TrophyIcon className="w-5 h-5 sm:w-6 sm:h-6" /> Top Performing Products
+    </h2>
+    <div className="h-64 sm:h-72 md:h-80">
+      <Doughnut data={doughnutData} options={{ ...doughnutOptions, responsive: true, maintainAspectRatio: false }} />
+    </div>
+  </div>
+</div>
 
-          <div
-            onClick={() => openModal("doughnut")}
-            className="cursor-pointer bg-slate-800 border border-slate-700 rounded-xl shadow-lg p-5 hover:shadow-[0_0_25px_rgba(0,255,255,0.7)] transition-shadow duration-300"
-          >
-            <h2 className="text-cyan-400 font-semibold mb-3 drop-shadow-[0_0_6px_#0ff] flex items-center gap-2">
-              <TrophyIcon className="w-6 h-6" /> Top Performing Products
-            </h2>
-            <Doughnut data={doughnutData} options={doughnutOptions} />
-          </div>
-        </div>
 
         {/* Search Input */}
         <div className="mt-5">
@@ -504,19 +548,80 @@ const handleDelete = async (productName) => {
                       <td className="px-2 py-1">{item.stock}</td>
                       <td className="px-2 py-1">
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation(); // prevent modal open
-                            handleDelete(item.product);
-                          }}
-                          className="text-red-400 hover:text-red-600 transition-colors"
-                        >
-                          <TrashIcon className="w-5 h-5" />
-                        </button>
+  onClick={(e) => {
+    e.stopPropagation(); // prevent chart modal from opening
+    setProductToDelete(item.product); // store the product to delete
+    setShowDeleteModal(true);         // show the confirmation modal
+  }}
+  className="text-red-400 hover:text-red-600 transition-colors"
+>
+  <TrashIcon className="w-5 h-5" />
+</button>
+
                       </td>
                     </tr>
                   ))
                 )}
               </tbody>
+
+
+{showDeleteModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-slate-800 p-6 rounded-xl shadow-lg w-80 text-center text-white">
+      <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
+      <p className="mb-6">
+        Are you sure you want to delete "{productToDelete}"? This action cannot be undone.
+      </p>
+      <div className="flex justify-center gap-4">
+        <button
+          className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500 transition"
+          onClick={async () => {
+            try {
+              const res = await fetch(
+                "https://smartsales-dt0f.onrender.com/api/delete-product",
+                {
+                  method: "DELETE",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ product: productToDelete }),
+                }
+              );
+
+              const data = await res.json();
+
+              if (!res.ok) {
+                alert(data.error || "Failed to delete product.");
+                return;
+              }
+
+              setPredictions((prev) =>
+                prev.filter((p) => p.product !== productToDelete)
+              );
+              setDeletedMessage(`"${productToDelete}" deleted successfully!`);
+              setTimeout(() => setDeletedMessage(""), 3000);
+            } catch (err) {
+              console.error(err);
+              alert("Error deleting product. Please try again.");
+            } finally {
+              setShowDeleteModal(false);
+              setProductToDelete(null);
+            }
+          }}
+        >
+          Delete
+        </button>
+        <button
+          className="bg-gray-600 px-4 py-2 rounded-lg hover:bg-gray-500 transition"
+          onClick={() => setShowDeleteModal(false)}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
             </table>
           </div>
 

@@ -7,10 +7,14 @@ import {
 } from "@heroicons/react/24/outline";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import DashboardBottom from "../components/DashboardBottom";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+
 
   // Dashboard states
   const [months, setMonths] = useState([]);
@@ -140,21 +144,95 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-200 font-sans">
-      {/* NAVBAR */}
-      <nav className="flex justify-center gap-6 p-4 fixed top-0 w-full bg-slate-900/60 backdrop-blur-xl shadow-lg border-b border-slate-700 z-50">
-        <Link to="/" className={getLinkClasses("/")}>
-          <HomeIcon className="w-5 h-5" /> Home
+  {/* NAVBAR */}
+  <nav className="fixed top-0 w-full bg-slate-900/60 backdrop-blur-xl shadow-lg border-b border-slate-700 z-50">
+    <div className="flex justify-between items-center p-2 sm:p-3 relative">
+      
+      {/* Logo on the left */}
+      <div className="text-cyan-400 font-bold text-lg sm:text-xl">
+        Smart Sales
+      </div>
+
+      {/* Desktop menu */}
+      <div className="hidden sm:flex flex-1 justify-center gap-2 sm:gap-4 md:gap-6">
+        <Link
+          to="/"
+          className={getLinkClasses("/") + " flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base"}
+        >
+          <HomeIcon className="w-3 h-3 sm:w-4 sm:h-5 md:w-5 md:h-5" /> Home
         </Link>
-        <Link to="/dashboard" className={getLinkClasses("/dashboard")}>
-          <ChartBarIcon className="w-5 h-5" /> Dashboard
+
+        <Link
+          to="/dashboard"
+          className={getLinkClasses("/dashboard") + " flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base"}
+        >
+          <ChartBarIcon className="w-3 h-3 sm:w-4 sm:h-5 md:w-5 md:h-5" /> Dashboard
         </Link>
-        <Link to="/chatbot" className={getLinkClasses("/chatbot")}>
-          <CpuChipIcon className="w-5 h-5" /> Chatbot
+
+        <Link
+          to="/chatbot"
+          className={getLinkClasses("/chatbot") + " flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base"}
+        >
+          <CpuChipIcon className="w-3 h-3 sm:w-4 sm:h-5 md:w-5 md:h-5" /> Chatbot
         </Link>
-        <Link to="/product_predictions" className={getLinkClasses("/product_predictions")}>
-          <CubeIcon className="w-5 h-5" /> Products
+
+        <Link
+          to="/product_predictions"
+          className={getLinkClasses("/product_predictions") + " flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base"}
+        >
+          <CubeIcon className="w-3 h-3 sm:w-4 sm:h-5 md:w-5 md:h-5" /> Products
         </Link>
-      </nav>
+      </div>
+
+      {/* Mobile menu toggle */}
+      <button
+        className="sm:hidden text-white absolute right-3 top-2"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
+      </button>
+    </div>
+
+    {/* Mobile collapsible menu */}
+    {isOpen && (
+      <div className="sm:hidden flex flex-col gap-2 px-3 pb-3">
+        <Link
+          to="/"
+          className={getLinkClasses("/") + " flex items-center gap-1"}
+          onClick={() => setIsOpen(false)}
+        >
+          <HomeIcon className="w-4 h-4" /> Home
+        </Link>
+
+        <Link
+          to="/dashboard"
+          className={getLinkClasses("/dashboard") + " flex items-center gap-1"}
+          onClick={() => setIsOpen(false)}
+        >
+          <ChartBarIcon className="w-4 h-4" /> Dashboard
+        </Link>
+
+        <Link
+          to="/chatbot"
+          className={getLinkClasses("/chatbot") + " flex items-center gap-1"}
+          onClick={() => setIsOpen(false)}
+        >
+          <CpuChipIcon className="w-4 h-4" /> Chatbot
+        </Link>
+
+        <Link
+          to="/product_predictions"
+          className={getLinkClasses("/product_predictions") + " flex items-center gap-1"}
+          onClick={() => setIsOpen(false)}
+        >
+          <CubeIcon className="w-4 h-4" /> Products
+        </Link>
+      </div>
+    )}
+  </nav>
+
+
+
 
       {/* Dashboard Content */}
       <div className="p-5 pt-32 space-y-5">

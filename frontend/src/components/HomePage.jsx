@@ -9,11 +9,15 @@ import {
   PlusCircleIcon,
   MinusCircleIcon,
   XMarkIcon,
+  Bars3Icon,   // Add Bars3Icon here
 } from "@heroicons/react/24/outline";
+
 
 const HomePage = () => {
   const navigate = useNavigate();
   const location = useLocation(); // ADDED
+  const [isOpen, setIsOpen] = useState(false); // MOBILE MENU TOGGLE
+
 
   // ⭐ INITIAL MODE FROM LOCATION
   const initialMode = location.state?.mode === "product-sales" ? "product" : "forecast";
@@ -157,51 +161,143 @@ const HomePage = () => {
         }}
       ></div>
 
-      {/* NAVBAR */}
-      <nav className="flex justify-center gap-6 p-4 fixed top-0 w-full bg-slate-900/60 backdrop-blur-xl shadow-lg border-b border-slate-700 z-50">
-        <Link to="/" className="px-5 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium hover:scale-105 transition-all flex items-center gap-2">
-          <HomeIcon className="w-5 h-5" /> Home
-        </Link>
-        <Link to="/dashboard" className="px-5 py-2 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 hover:text-white font-medium hover:scale-105 transition-all flex items-center gap-2">
-          <ChartBarIcon className="w-5 h-5" /> Dashboard
-        </Link>
-        <Link to="/chatbot" className="px-5 py-2 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 hover:text-white font-medium hover:scale-105 transition-all flex items-center gap-2">
-          <CpuChipIcon className="w-5 h-5" /> Chatbot
-        </Link>
-        <Link to="/product_predictions" className="px-5 py-2 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 hover:text-white font-medium hover:scale-105 transition-all flex items-center gap-2">
-          <CubeIcon className="w-5 h-5" /> Products
-        </Link>
+    {/* NAVBAR */}
+<nav className="fixed top-0 w-full bg-slate-900/60 backdrop-blur-xl shadow-lg border-b border-slate-700 z-50">
+  <div className="flex justify-between items-center p-2 sm:p-3 relative">
+    {/* Logo on the left */}
+    <div className="text-cyan-400 font-bold text-lg sm:text-xl">
+      Smart Sales
+    </div>
 
-        {/* RESTOCK BUTTON */}
-        <button
-          className="px-5 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-medium flex items-center gap-2 hover:scale-105 transition-all"
-          onClick={() => setRestockOpen(true)}
-        >
-          <PlusCircleIcon className="w-5 h-5" /> Restock
-        </button>
+    {/* Desktop menu */}
+    <div className="hidden sm:flex flex-1 justify-center gap-1 sm:gap-2 md:gap-4">
+      <Link
+        to="/"
+        className="px-2 sm:px-3 py-1 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium hover:scale-105 transition-all flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base"
+      >
+        <HomeIcon className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" /> Home
+      </Link>
 
-        {/* SOLD PRODUCT BUTTON */}
-        <button
-          className="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium flex items-center gap-2 hover:scale-105 transition-all"
-          onClick={() => setSoldOpen(true)}
-        >
-          <MinusCircleIcon className="w-5 h-5" /> Product Sold
-        </button>
-      </nav>
+      <Link
+        to="/dashboard"
+        className="px-2 sm:px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 hover:text-white font-medium hover:scale-105 transition-all flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base"
+      >
+        <ChartBarIcon className="w-3 h-3 sm:w-4 sm:h-5" /> Dashboard
+      </Link>
+
+      <Link
+        to="/chatbot"
+        className="px-2 sm:px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 hover:text-white font-medium hover:scale-105 transition-all flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base"
+      >
+        <CpuChipIcon className="w-3 h-3 sm:w-4 sm:h-5" /> Chatbot
+      </Link>
+
+      <Link
+        to="/product_predictions"
+        className="px-2 sm:px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 hover:text-white font-medium hover:scale-105 transition-all flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base"
+      >
+        <CubeIcon className="w-3 h-3 sm:w-4 sm:h-5" /> Products
+      </Link>
+
+      <button
+        className="px-2 sm:px-3 py-1 rounded-lg bg-green-600 hover:bg-green-500 text-white font-medium flex items-center gap-1 sm:gap-2 hover:scale-105 transition-all text-xs sm:text-sm md:text-base"
+        onClick={() => setRestockOpen(true)}
+      >
+        <PlusCircleIcon className="w-3 h-3 sm:w-4 sm:h-5" /> Restock
+      </button>
+
+      <button
+        className="px-2 sm:px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium flex items-center gap-1 sm:gap-2 hover:scale-105 transition-all text-xs sm:text-sm md:text-base"
+        onClick={() => setSoldOpen(true)}
+      >
+        <MinusCircleIcon className="w-3 h-3 sm:w-4 sm:h-5" /> Product Sold
+      </button>
+    </div>
+
+    {/* Hamburger button for mobile */}
+    <button
+      className="sm:hidden text-white absolute right-3 top-2"
+      onClick={() => setIsOpen(!isOpen)}
+    >
+      {isOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
+    </button>
+  </div>
+
+  {/* Mobile collapsible menu */}
+  {isOpen && (
+    <div className="sm:hidden flex flex-col gap-2 px-3 pb-3">
+      <Link
+        to="/"
+        className="px-2 py-1 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium flex items-center gap-1"
+        onClick={() => setIsOpen(false)}
+      >
+        <HomeIcon className="w-4 h-4" /> Home
+      </Link>
+
+      <Link
+        to="/dashboard"
+        className="px-2 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white font-medium flex items-center gap-1"
+        onClick={() => setIsOpen(false)}
+      >
+        <ChartBarIcon className="w-4 h-4" /> Dashboard
+      </Link>
+
+      <Link
+        to="/chatbot"
+        className="px-2 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white font-medium flex items-center gap-1"
+        onClick={() => setIsOpen(false)}
+      >
+        <CpuChipIcon className="w-4 h-4" /> Chatbot
+      </Link>
+
+      <Link
+        to="/product_predictions"
+        className="px-2 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white font-medium flex items-center gap-1"
+        onClick={() => setIsOpen(false)}
+      >
+        <CubeIcon className="w-4 h-4" /> Products
+      </Link>
+
+      <button
+        className="px-2 py-1 rounded-lg bg-green-600 hover:bg-green-500 text-white font-medium flex items-center gap-1"
+        onClick={() => {
+          setRestockOpen(true);
+          setIsOpen(false);
+        }}
+      >
+        <PlusCircleIcon className="w-4 h-4" /> Restock
+      </button>
+
+      <button
+        className="px-2 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium flex items-center gap-1"
+        onClick={() => {
+          setSoldOpen(true);
+          setIsOpen(false);
+        }}
+      >
+        <MinusCircleIcon className="w-4 h-4" /> Product Sold
+      </button>
+    </div>
+  )}
+</nav>
+
+
 
       {/* HERO CONTENT */}
       <div className="pt-32 pb-16 px-5 flex flex-col items-center text-center relative z-10">
         <div className="max-w-3xl">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-lg mb-4">
-            Smart Sales Forecasting System
-          </h1>
-          <p className="text-lg md:text-xl text-slate-300 mb-10 leading-relaxed">
-            Predict future sales, analyze product performance, and manage stock levels with AI-powered forecasting.
-          </p>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-lg mb-4">
+  Smart Sales Forecasting System
+</h1>
+
+          <p className="text-base md:text-lg text-slate-300 mb-8 md:mb-10 leading-relaxed">
+  Predict future sales, analyze product performance, and manage stock levels with AI-powered forecasting.
+</p>
+
         </div>
 
         {/* FORM PANEL */}
-        <div className="w-full max-w-2xl p-1 rounded-3xl bg-gradient-to-r from-cyan-500/40 to-blue-500/40 mb-8 shadow-2xl">
+<div className="w-11/12 md:w-full max-w-xl md:max-w-2xl p-3 md:p-6 rounded-3xl bg-gradient-to-r from-cyan-500/40 to-blue-500/40 mb-8 shadow-2xl">
           <div className="bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 border border-slate-700 shadow-xl">
             <div className="flex items-center justify-center gap-2 text-cyan-300 mb-3">
               <SparklesIcon className="w-6 h-6" />
@@ -242,7 +338,7 @@ const HomePage = () => {
                       type="text"
                       value={product}
                       onChange={(e) => setProduct(e.target.value)}
-                      className="w-full mt-2 p-3 bg-slate-800 border border-slate-700 rounded-lg text-white"
+                        className="w-full mt-2 p-2 md:p-3 bg-slate-800 border border-slate-700 rounded-lg text-white"
                       required
                     />
                   </div>
@@ -295,7 +391,7 @@ const HomePage = () => {
       {/* RESTOCK MODAL */}
       {restockOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-[999]">
-          <div className="bg-slate-900 p-6 rounded-2xl w-full max-w-md border border-slate-700 shadow-xl relative">
+          <div className="bg-slate-900 p-4 md:p-6 rounded-2xl w-11/12 md:w-full max-w-md border border-slate-700 shadow-xl relative">
             <button
               className="absolute top-3 right-3 text-slate-400 hover:text-white"
               onClick={() => setRestockOpen(false)}

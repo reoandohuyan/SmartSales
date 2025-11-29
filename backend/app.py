@@ -342,7 +342,7 @@ def mistral_chat():
     MISTRAL_URL = "https://api.mistral.ai/v1/conversations"
 
     headers = {"X-API-KEY": MISTRAL_API_KEY, "Content-Type": "application/json"}
-    payload = {"model": "mistral-large-latest", "inputs": [{"role": "user", "content": prompt}], "completion_args": {"max_tokens": 300}}
+    payload = {"model": "mistral-large-latest", "inputs": [{"role": "user", "content": prompt}], "completion_args": {"max_tokens": 1000}}
 
     bot_reply = "🤖 Sorry, I couldn’t get a response."
     try:
