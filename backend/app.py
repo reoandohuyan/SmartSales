@@ -1,23 +1,30 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import numpy as np
-from sklearn.linear_model import LinearRegression
-import warnings
-import json
-import os
-import requests  # For Mistral API calls
-from statsmodels.tsa.arima.model import ARIMA
-from flask import send_from_directory
+# ==================== IMPORT LIBRARIES ====================
+# Import all necessary libraries for backend, AI, and serving frontend
+from flask import Flask, request, jsonify, send_from_directory  # Flask web framework
+from flask_cors import CORS  # Enable cross-origin requests from React frontend
+import numpy as np  # Numerical computations for forecasting
+from sklearn.linear_model import LinearRegression  # Linear Regression for sales prediction
+import warnings  # Handle or ignore warning messages
+import json  # Read/write JSON files for data storage
+import os  # Handle file paths and directories
+import requests  # Make HTTP requests (e.g., Mistral AI API)
+from statsmodels.tsa.arima.model import ARIMA  # Time series forecasting for trends
 
-# Path to React build folder
+# ==================== CONFIGURATION ====================
+warnings.filterwarnings("ignore")  # Ignore warnings for clean console output
 
-warnings.filterwarnings("ignore")
-
+# Initialize Flask app
 app = Flask(__name__)
+
+# Enable CORS so frontend (React) can make API calls to backend
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# --- Helper functions ---
+# ==================== HELPER FUNCTIONS ====================
+# Functions to read and write JSON files, used for persistent storage of sales and product data
 def load_json_file(filename, default):
+    """
+    Load JSON data from a file. If file does not exist or is corrupted, return default value.
+    """
     if os.path.exists(filename):
         with open(filename, 'r', encoding='utf-8') as f:
             try:
@@ -27,77 +34,81 @@ def load_json_file(filename, default):
     return default
 
 def save_json_file(filename, data):
+    """
+    Save Python data as JSON file with indentation for readability.
+    """
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
 
-# --- ROUTES ---
-
-# Path to React build folder (one level above backend)
-FRONTEND_BUILD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../frontend/build")
-
-# Correct path to React build
+# ==================== SERVE REACT STATIC FILES ====================
+# Serve the React frontend build files from the backend
 FRONTEND_BUILD_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "frontend", "build")
 )
 
-
-# --- Serve React Static Files Correctly ---
-
-# Serve JS files
+# Serve JavaScript files from React build
 @app.route('/static/js/<path:filename>')
 def serve_js(filename):
     return send_from_directory(os.path.join(FRONTEND_BUILD_DIR, "static/js"), filename)
 
-# Serve CSS files
+# Serve CSS files from React build
 @app.route('/static/css/<path:filename>')
 def serve_css(filename):
     return send_from_directory(os.path.join(FRONTEND_BUILD_DIR, "static/css"), filename)
 
-# Serve media (images/fonts)
+# Serve media files (images, fonts)
 @app.route('/static/media/<path:filename>')
 def serve_media(filename):
     return send_from_directory(os.path.join(FRONTEND_BUILD_DIR, "static/media"), filename)
 
-# Generic static handler (for safety)
+# Generic static file handler for safety
 @app.route('/static/<path:filename>')
 def serve_static(filename):
     return send_from_directory(os.path.join(FRONTEND_BUILD_DIR, "static"), filename)
 
-
-
-
-
-
+# Debugging: print the frontend build folder being served
 print("SERVING REACT FROM:", FRONTEND_BUILD_DIR)
 
-
-
-
-# === Monthly Sales Routes ===
+# ==================== SALES API ROUTES ====================
+# Route to add monthly sales data
 @app.route("/add_sales", methods=['POST'])
 def add_sales():
-    if not request.is_json:
+    """
+    Receives JSON with 'month' and 'sales' from frontend, validates it,
+    stores it in sales_data.json, and returns a success response.
+    """
+    if not request.is_json:  # Validate request content type
         return jsonify({"error": "Request must be JSON"}), 400
 
     month = request.json.get('month')
     sales = request.json.get('sales')
 
-    if not month or sales is None:
+    if not month or sales is None:  # Validate required fields
         return jsonify({"error": "Missing month or sales"}), 400
 
+    # Load existing sales data or start with empty list
     sales_data = load_json_file('sales_data.json', [])
+    
+    # Append new sales entry and save to file
     sales_data.append({"month": month, "sales": int(sales)})
     save_json_file('sales_data.json', sales_data)
 
+    # Return confirmation to frontend
     return jsonify({
         "message": "Sales data added successfully",
         "data": {"month": month, "sales": sales}
     })
+# ==================== DASHBOARD AND SALES API ROUTES ====================
 
+# Route: /api/dashboard
+# Purpose: Fetch sales data, predict next month's sales using Linear Regression and ARIMA,
+# and provide a recommendation based on predicted trends.
 @app.route("/api/dashboard")
 def dashboard():
+    # Load all monthly sales data from JSON file
     sales_data = load_json_file('sales_data.json', [])
 
+    # If no data exists, return empty response with default values
     if not sales_data:
         return jsonify({
             "months": [],
@@ -107,18 +118,21 @@ def dashboard():
             "recommendation": "No data available yet."
         })
 
+    # Extract months and sales into separate lists
     months = [entry["month"] for entry in sales_data]
     sales = [entry["sales"] for entry in sales_data]
 
-    # Linear Regression Prediction
-    X = np.arange(len(sales)).reshape(-1, 1)
-    y = np.array(sales)
+    # --- Linear Regression Prediction ---
+    # Predict next month's sales based on existing trend
+    X = np.arange(len(sales)).reshape(-1, 1)  # Month indices as feature
+    y = np.array(sales)                        # Sales values as target
     lr_model = LinearRegression()
-    lr_model.fit(X, y)
+    lr_model.fit(X, y)                         # Fit model
     next_month_index = len(sales)
     lr_prediction = int(lr_model.predict([[next_month_index]])[0])
 
-    # ARIMA Forecast
+    # --- ARIMA Time Series Forecasting ---
+    # Forecast next month using ARIMA; fallback to moving average if ARIMA fails
     try:
         arima_model = ARIMA(sales, order=(1,1,1))
         arima_fit = arima_model.fit()
@@ -130,6 +144,7 @@ def dashboard():
         else:
             ts_prediction = int(np.mean(sales))
 
+    # --- Recommendation Logic ---
     last_sales = sales[-1]
     if lr_prediction > last_sales:
         recommendation = "📈 Sales are expected to increase next month!"
@@ -138,6 +153,7 @@ def dashboard():
     else:
         recommendation = "⚖️ Sales likely stable next month."
 
+    # Return dashboard data as JSON
     return jsonify({
         "months": months,
         "sales": sales,
@@ -146,12 +162,19 @@ def dashboard():
         "recommendation": recommendation
     })
 
-# === Server.js routes for sales_data.json ===
+
+# ==================== SALES DATA CRUD ROUTES ====================
+
+# Route: /api/sales-data
+# Purpose: Fetch all raw sales data for frontend display
 @app.route("/api/sales-data")
 def get_sales_data():
     data = load_json_file("sales_data.json", [])
     return jsonify(data)
 
+
+# Route: /api/add-sale
+# Purpose: Add a single new sale entry via POST request
 @app.route("/api/add-sale", methods=["POST"])
 def api_add_sale():
     if not request.is_json:
@@ -160,22 +183,26 @@ def api_add_sale():
     sales = request.json.get("sales")
     if not month or sales is None:
         return jsonify({"error": "Missing month or sales"}), 400
+
     sales_data = load_json_file("sales_data.json", [])
     sales_data.append({"month": month, "sales": int(sales)})
     save_json_file("sales_data.json", sales_data)
+
     return jsonify({"message": "Sale added successfully", "data": sales_data})
 
-# --- FIXED FULL TABLE UPDATE ---
+
+# Route: /api/update-sales
+# Purpose: Update all sales data in one request (PUT)
 @app.route("/api/update-sales", methods=["PUT"])
 def update_sales():
     if not request.is_json:
         return jsonify({"error": "Request must be JSON"}), 400
 
-    data = request.json.get("data")  # expect [{month: ..., sales: ...}, ...]
+    data = request.json.get("data")  # Expect list of {month, sales} dictionaries
     if not isinstance(data, list):
         return jsonify({"error": "Invalid data format. Must be a list."}), 400
 
-    # Convert sales to int and sanitize
+    # Sanitize data: ensure sales are integers and month is string
     for entry in data:
         entry["sales"] = int(entry.get("sales", 0))
         entry["month"] = str(entry.get("month", ""))
@@ -183,7 +210,9 @@ def update_sales():
     save_json_file("sales_data.json", data)
     return jsonify({"message": "All sales updated successfully", "data": data}), 200
 
-# --- DELETE SALE ROUTE ---
+
+# Route: /api/delete-sale
+# Purpose: Delete a sales record for a specific month
 @app.route("/api/delete-sale", methods=["DELETE"])
 def delete_sale():
     if not request.is_json:
@@ -193,13 +222,17 @@ def delete_sale():
     if not month:
         return jsonify({"error": "Missing month"}), 400
 
+    # Remove entries matching the month
     sales_data = load_json_file("sales_data.json", [])
     filtered_data = [item for item in sales_data if item["month"] != month]
     save_json_file("sales_data.json", filtered_data)
 
     return jsonify({"message": f"Deleted sales for month: {month}", "data": filtered_data}), 200
 
+# ==================== PRODUCT MANAGEMENT ROUTES ====================
 
+# Route: /api/delete-product
+# Purpose: Delete a product from the system by name
 @app.route("/api/delete-product", methods=["DELETE"])
 def delete_product():
     if not request.is_json:
@@ -209,9 +242,11 @@ def delete_product():
     if not product_name:
         return jsonify({"error": "Missing product"}), 400
 
+    # Load all products and filter out the one to delete
     product_data = load_json_file("product_data.json", [])
     new_data = [p for p in product_data if p["product"].lower() != product_name.lower()]
 
+    # If length is unchanged, product was not found
     if len(new_data) == len(product_data):
         return jsonify({"error": "Product not found"}), 404
 
@@ -219,7 +254,8 @@ def delete_product():
     return jsonify({"message": f"Product '{product_name}' deleted successfully", "data": new_data}), 200
 
 
-# === Product Routes ===
+# Route: /add_product_sales
+# Purpose: Add a new product or update existing product's sales and stock
 @app.route("/add_product_sales", methods=['POST'])
 def add_product_sales():
     if not request.is_json:
@@ -233,6 +269,8 @@ def add_product_sales():
         return jsonify({"error": "Missing product, last_sales, or stock"}), 400
 
     product_data = load_json_file('product_data.json', [])
+
+    # Check if product exists; update it
     for p in product_data:
         if p['product'].lower() == product.lower():
             p['last_sales'] = int(last_sales)
@@ -240,11 +278,15 @@ def add_product_sales():
             save_json_file('product_data.json', product_data)
             return jsonify({"message": "Product updated successfully", "data": p})
 
+    # If new product, append to list
     new_product = {"product": product, "last_sales": int(last_sales), "stock": int(stock)}
     product_data.append(new_product)
     save_json_file('product_data.json', product_data)
     return jsonify({"message": "Product added successfully", "data": new_product})
 
+
+# Route: /api/products-dashboard
+# Purpose: Provide dashboard data for products, including forecasts and trends
 @app.route("/api/products-dashboard")
 def products_dashboard():
     product_data = load_json_file('product_data.json', [])
@@ -254,6 +296,7 @@ def products_dashboard():
         last_sales = item.get('last_sales', 0)
         stock = item.get('stock', 0)
 
+        # Simple forecast: increase last sales by 20%
         forecast = int(last_sales * 1.2)
         trend = "Up" if forecast > last_sales else "Down"
 
@@ -267,12 +310,17 @@ def products_dashboard():
 
     return jsonify({"predictions": predictions})
 
-# === Server.js routes for product_sales.json ===
+
+# Route: /api/product-sales
+# Purpose: Get all product sales data (raw JSON)
 @app.route("/api/product-sales")
 def get_product_sales():
     data = load_json_file("product_sales.json", [])
     return jsonify(data)
 
+
+# Route: /api/add_product_stock
+# Purpose: Add stock quantity to an existing product or create it if not exists
 @app.route("/api/add_product_stock", methods=["POST"])
 def add_product_stock():
     if not request.is_json:
@@ -284,18 +332,24 @@ def add_product_stock():
 
     product_data = load_json_file("product_data.json", [])
     found = False
+
+    # Update existing product
     for p in product_data:
         if p["product"].lower() == product.lower():
             p["stock"] += int(added_stock)
             found = True
             break
 
+    # If product does not exist, add it
     if not found:
         product_data.append({"product": product, "last_sales": 0, "stock": int(added_stock)})
 
     save_json_file("product_data.json", product_data)
     return jsonify({"message": "Stock updated successfully", "data": product_data})
 
+
+# Route: /api/restock
+# Purpose: Restock a product with a given quantity (similar to add_product_stock)
 @app.route("/api/restock", methods=["POST"])
 def restock_product():
     if not request.is_json:
@@ -309,28 +363,35 @@ def restock_product():
 
     product_data = load_json_file("product_data.json", [])
     found = False
+
+    # Update stock if product exists
     for p in product_data:
         if p["product"].lower() == product_name.lower():
             p["stock"] += int(quantity)
             found = True
             break
 
+    # If product not found, create new entry
     if not found:
         product_data.append({"product": product_name, "last_sales": 0, "stock": int(quantity)})
 
     save_json_file("product_data.json", product_data)
     return jsonify({"message": "Stock updated successfully", "data": product_data})
+# ==================== MISTRAL AI CHATBOT ====================
 
-# === Mistral AI Chatbot ===
+# Route: /api/mistral
+# Purpose: Handle chatbot queries using Mistral AI model
 @app.route("/api/mistral", methods=["POST"])
 def mistral_chat():
     user_message = request.json.get("message")
     if not user_message:
         return jsonify({"reply": "No message received"}), 400
 
+    # Load product catalog and sales history for context
     product_data = load_json_file('product_data.json', [])
     sales_data = load_json_file('sales_data.json', [])
 
+    # Build the prompt for the AI model
     prompt = (
         f"User question: {user_message}\n\n"
         f"Product catalog:\n{json.dumps(product_data)}\n\n"
@@ -338,19 +399,27 @@ def mistral_chat():
         "Please analyze and answer."
     )
 
+    # Mistral API credentials and endpoint
     MISTRAL_API_KEY = "YTntkY0b0zaPAVpgKUvROJrwIeoYSuoz"
     MISTRAL_URL = "https://api.mistral.ai/v1/conversations"
 
     headers = {"X-API-KEY": MISTRAL_API_KEY, "Content-Type": "application/json"}
-    payload = {"model": "mistral-large-latest", "inputs": [{"role": "user", "content": prompt}], "completion_args": {"max_tokens": 1000}}
+    payload = {
+        "model": "mistral-large-latest",
+        "inputs": [{"role": "user", "content": prompt}],
+        "completion_args": {"max_tokens": 1000}
+    }
 
+    # Default reply in case of errors
     bot_reply = "🤖 Sorry, I couldn’t get a response."
     try:
+        # Send request to Mistral API
         response = requests.post(MISTRAL_URL, headers=headers, json=payload)
         if response.status_code == 200:
             data = response.json()
             if "outputs" in data and len(data["outputs"]) > 0:
                 content = data["outputs"][0].get("content")
+                # Extract the response text from various possible formats
                 if isinstance(content, list) and len(content) > 0:
                     text_item = content[0]
                     if isinstance(text_item, dict) and "text" in text_item:
@@ -366,36 +435,73 @@ def mistral_chat():
 
     return jsonify({"reply": bot_reply})
 
-# === Sell Product Route ===
 @app.route("/api/sell_product", methods=["POST"])
 def sell_product():
     if not request.is_json:
         return jsonify({"error": "Request must be JSON"}), 400
+
     product = request.json.get("product")
     sold_quantity = request.json.get("sold_quantity")
-    if not product or sold_quantity is None:
-        return jsonify({"error": "Missing product or sold_quantity"}), 400
+    cost_per_unit = request.json.get("cost_per_unit")
+
+    print("Received sale request:", request.json)  # ✅ Debug
+
+    # Validate inputs
+    try:
+        sold_quantity = int(sold_quantity)
+        cost_per_unit = float(cost_per_unit)
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid quantity or cost"}), 400
+
+    if not product or sold_quantity <= 0 or cost_per_unit <= 0:
+        return jsonify({"error": "Missing or invalid product, sold_quantity, or cost_per_unit"}), 400
 
     product_data = load_json_file("product_data.json", [])
+    print("Current product data before sale:", product_data)  # ✅ Debug
 
+    # Process the sale
     for p in product_data:
         if p["product"].lower() == product.lower():
-            if p["stock"] >= sold_quantity:
-                p["stock"] -= int(sold_quantity)
-                save_json_file("product_data.json", product_data)
-                return jsonify({"message": "Product sold successfully", "data": p}), 200
-            else:
+            # Check stock
+            if p["stock"] < sold_quantity:
                 return jsonify({"error": f"Not enough stock. Current stock: {p['stock']}"}), 400
 
+            # Deduct stock
+            p["stock"] -= sold_quantity
+
+            # Add to last_sales
+            try:
+                previous_sales = float(p.get("last_sales", 0))
+            except (ValueError, TypeError):
+                previous_sales = 0.0
+
+            total_sale = sold_quantity * cost_per_unit
+            p["last_sales"] = round(previous_sales + total_sale, 2)
+
+            # Debug
+            print(f"[DEBUG] Updated product after sale: {p}")
+
+            # Save changes
+            save_json_file("product_data.json", product_data)
+
+            return jsonify({
+                "message": "Product sold successfully",
+                "data": p,
+                "total_sale": total_sale
+            }), 200
+
+    # If product not found
     return jsonify({"error": "Product not found"}), 404
 
 
+# ==================== CATCH-ALL ROUTE FOR REACT ====================
 
-# === CATCH-ALL ROUTE FOR REACT (Fixed) ===
+# Route: Catch-all for frontend routes
+# Purpose: Serve React app and handle unknown API routes
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
-    # If the request is for an API route, let Flask handle it or return 404
+    # If request is for API endpoint, return 404
     if path.startswith('api/'):
         return jsonify({"error": f"API endpoint '/{path}' not found"}), 404
 
@@ -412,6 +518,7 @@ def serve_react(path):
         return "React build not found", 404
 
 
+# ==================== START FLASK SERVER ====================
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

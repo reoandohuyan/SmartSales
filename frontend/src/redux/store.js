@@ -1,26 +1,32 @@
 import { configureStore, createSlice } from "@reduxjs/toolkit";
-import productsReducer from "./productsSlice"; // ✅ import products slice
+import productsReducer from "./productsSlice"; // ✅ Import products slice to include in store
 
-// === Example dashboard slice ===
+// -----------------------------
+// Example dashboard slice
+// -----------------------------
 const dashboardSlice = createSlice({
-  name: "dashboard",
+  name: "dashboard", // Name of the slice
   initialState: {
-    months: ["Jan", "Feb", "Mar", "Apr", "May"],
-    sales: [5000, 7000, 6500, 8000, 7200],
-    prediction: 7800,
-    recommendation: "Increase marketing for best-selling months",
+    months: ["Jan", "Feb", "Mar", "Apr", "May"], // Example months
+    sales: [5000, 7000, 6500, 8000, 7200],       // Corresponding sales data
+    prediction: 7800,                             // Predicted sales for next month
+    recommendation: "Increase marketing for best-selling months", // Example recommendation
   },
   reducers: {
-    // Optional: add reducers here later
+    // Optional: add reducers here later to update dashboard state
   },
 });
 
-// ✅ single store definition with both slices
+// -----------------------------
+// Configure Redux store
+// -----------------------------
 const store = configureStore({
   reducer: {
-    dashboard: dashboardSlice.reducer,
-    products: productsReducer,
+    // Add multiple slices here
+    dashboard: dashboardSlice.reducer, // Dashboard slice state
+    products: productsReducer,         // Products slice state
   },
 });
 
+// Export the store to use in your React app
 export default store;
