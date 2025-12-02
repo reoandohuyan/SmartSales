@@ -19,21 +19,23 @@ module.exports = {
           '50%': { transform: 'translateY(-20px)' },
         },
         blink: {
-          '0%, 50%, 100%': {
-            opacity: '1',
-            textShadow: '0 0 5px #06b6d4, 0 0 10px #06b6d4, 0 0 20px #06b6d4'
-          },
-          '25%, 75%': {
-            opacity: '0.2',
-            textShadow: 'none'
-          },
-        },
+  '0%, 100%': {
+    opacity: 1,
+    textShadow: '0 0 6px #06b6d4, 0 0 12px #06b6d4'
+  },
+  '50%': {
+    opacity: 0.7,
+    textShadow: '0 0 3px #06b6d4'
+  },
+},
+
       },
       animation: {
         fadeIn: 'fadeIn 0.3s ease-out',
         scaleUp: 'scaleUp 0.3s ease-out',
         float: 'float 4s ease-in-out infinite',
-        blink: 'blink 1s infinite',
+        blink: 'blink 2.5s ease-in-out infinite',
+
       },
     },
   },
