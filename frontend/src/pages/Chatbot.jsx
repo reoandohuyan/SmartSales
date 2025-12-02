@@ -142,8 +142,8 @@ setMessages((prev) => [
             onClick={() => setIsOpen(!isOpen)}  // Toggle mobile menu
           >
             {isOpen 
-              ? <XMarkIcon className="w-6 h-6" />   // Close icon
-              : <Bars3Icon className="w-6 h-6" />}  // Open icon
+              ? <XMarkIcon className="w-6 h-6" />   // Close icon`
+              : <Bars3Icon className="w-6 h-6" />} 
           </button>
 
           {/* Desktop navigation menu */}
